@@ -121,6 +121,12 @@ public class LoginApp extends Application {
             String username = usernameField.getText();
             String password = passwordField.getText();
             String email = emailField.getText();
+
+            if (!isValidMail(email)) {
+                showAlert(Alert.AlertType.ERROR, "Invalid Email", "Please enter a valid email address with an '@' and at least 5 characters.");
+                return;
+            }
+
             if (!username.isEmpty() && !password.isEmpty() && !email.isEmpty()) {
                 String result = UserDAO.addUser(username, password, email);
 
@@ -185,5 +191,10 @@ public class LoginApp extends Application {
         alert.setHeaderText(null);
         alert.setContentText(message);
         alert.showAndWait();
+    }
+
+    //Helper method to validate the email
+    private boolean isValidMail (String email) {
+        return email.contains("@") && email.length() >= 5;
     }
 }
