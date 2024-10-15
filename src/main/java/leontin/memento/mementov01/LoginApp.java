@@ -96,33 +96,46 @@ public class LoginApp extends Application {
 
         Label usernameLabel = new Label("Username:");
         TextField usernameField = new TextField();
+        usernameField.setPrefWidth(200); // Set a preferred width
+
         Label passwordLabel = new Label("Password");
         PasswordField passwordField = new PasswordField();
+        passwordField.setPrefWidth(200); // Set a preferred width
+
+        Label emailLabel = new Label("Email:");
+        TextField emailField = new TextField();
+        emailField.setPrefWidth(200); // Set a preferred width
+
         Button createButton = new Button("Create");
 
         gridPane.add(usernameLabel, 0, 0);
         gridPane.add(usernameField, 1, 0);
         gridPane.add(passwordLabel, 0, 1);
         gridPane.add(passwordField, 1, 1);
-        gridPane.add(createButton, 1, 2);
+        gridPane.add(emailLabel, 0, 2);
+        gridPane.add(emailField, 1, 2);
+        gridPane.add(createButton, 1, 3);
 
         //Handle user creation
         createButton.setOnAction(actionEvent -> {
             String username = usernameField.getText();
             String password = passwordField.getText();
-            if (!username.isEmpty() && !password.isEmpty()) {
-                String result = UserDAO.addUser(username, password);
+            String email = emailField.getText();
+            if (!username.isEmpty() && !password.isEmpty() && !email.isEmpty()) {
+                String result = UserDAO.addUser(username, password, email);
 
                 if (result.equals("User created successfully")) {
                     showAlert(Alert.AlertType.INFORMATION, "User Created", "User " + username + " created successfully!");
                     createUserStage.close();
                 } else if (result.equals("Username already exists")) {
                     showAlert(Alert.AlertType.WARNING, "User Creation Failed", "Username '" + username + "' is already taken. Please choose a different username.");
+                } else if (result.equals("Email already registered")) {
+                    showAlert(Alert.AlertType.WARNING, "User Creation Failed", "Email '" + email + "' is already registered. Please use a different email.");
                 } else {
                     showAlert(Alert.AlertType.ERROR, "Error", result);
                 }
             } else {
-                showAlert(Alert.AlertType.ERROR, "Creation Failed", "Please fill in both fields.");
+                showAlert(Alert.AlertType.ERROR, "Creation Failed", "Please fill in all fields.");
             }
         });
 
