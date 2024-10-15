@@ -194,7 +194,7 @@ public class LoginApp extends Application {
     }
 
     //Helper method to validate the email
-    private boolean isValidMail (String email) {
+    private boolean isValidMail(String email) {
         return email.contains("@") && email.length() >= 5;
     }
 }
