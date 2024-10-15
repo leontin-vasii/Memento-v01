@@ -1,13 +1,16 @@
 package leontin.memento.mementov01;
+
+import org.mindrot.jbcrypt.BCrypt;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import org.mindrot.jbcrypt.BCrypt;
+
 public class UserDAO {
 
     // Method to insert a new user into the database
-    public static String  addUser(String username, String password , String email) {
+    public static String addUser(String username, String password, String email) {
         String sql = "INSERT INTO users(username, password, email) VALUES(?, ?, ?)";
 
         // Hash the password before storing it
