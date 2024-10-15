@@ -7,8 +7,8 @@ import org.mindrot.jbcrypt.BCrypt;
 public class UserDAO {
 
     // Method to insert a new user into the database
-    public static String  addUser(String username, String password) {
-        String sql = "INSERT INTO users(username, password) VALUES(?, ?)";
+    public static String  addUser(String username, String password , String email) {
+        String sql = "INSERT INTO users(username, password, email) VALUES(?, ?, ?)";
 
         // Hash the password before storing it
         String hashedPassword = BCrypt.hashpw(password, BCrypt.gensalt());
@@ -18,18 +18,19 @@ public class UserDAO {
 
             pstmt.setString(1, username);
             pstmt.setString(2, hashedPassword);
+            pstmt.setString(3, email);
             pstmt.executeUpdate();
             return "User created successfully";
 
         } catch (SQLException e) {
-
-            if (e.getMessage().contains("UNIQUE constraint failed: users.username")) {
-                System.out.println("Error: Username '" + username + "' already exists.");
-                return "Username already exists";
-            } else {
-                System.out.println("Error adding user: " + e.getMessage());
-                return "Error adding user: " + e.getMessage(); // Return the error message for other SQL issues
+            if (e.getMessage().contains("UNIQUE constraint failed")) {
+                if (e.getMessage().contains("users.username")) {
+                    return "Username already exists";
+                } else if (e.getMessage().contains("users.email")) {
+                    return "Email already registered";
+                }
             }
+            return "Error: " + e.getMessage();
         }
     }
 
