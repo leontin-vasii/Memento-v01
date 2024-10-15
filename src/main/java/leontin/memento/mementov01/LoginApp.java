@@ -13,10 +13,10 @@ import java.util.Map;
 public class LoginApp extends Application {
 
     //Store users in a HashMap (later replace with a database)
-    private Map<String, String> users = new HashMap<>();
+    private final Map<String, String> users = new HashMap<>();
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
 
         //Create the login form
         GridPane gridPane = new GridPane();
@@ -28,18 +28,18 @@ public class LoginApp extends Application {
 
         Label usernameLabel = new Label("Username");
         TextField usernameField = new TextField();
-        gridPane.add(usernameLabel, 0,0);
-        gridPane.add(usernameField,1,0);
+        gridPane.add(usernameLabel, 0, 0);
+        gridPane.add(usernameField, 1, 0);
 
         //Password label and field
         Label passwordLabel = new Label("Password");
         PasswordField passwordField = new PasswordField();
-        gridPane.add(passwordLabel,0,1);
-        gridPane.add(passwordField,1,1);
+        gridPane.add(passwordLabel, 0, 1);
+        gridPane.add(passwordField, 1, 1);
 
         //Login button
         Button loginButton = new Button("Login");
-        gridPane.add(loginButton,1,2);
+        gridPane.add(loginButton, 1, 2);
 
         // Hyperlink for creating a new user
         Hyperlink createUserLink = new Hyperlink("Create New User");
@@ -64,16 +64,16 @@ public class LoginApp extends Application {
     }
 
     //Method to handle login logic
-    private void handleLogin (String username , String password) {
+    private void handleLogin(String username, String password) {
 
-        if (users.containsKey(username)){
+        if (users.containsKey(username)) {
             if (users.get(username).equals(password)) {
                 showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
-            }else {
-                showAlert(Alert.AlertType.ERROR , "Login Failed", "Incorrect password." );
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Login Failed", "Incorrect password.");
             }
 
-        }else {
+        } else {
             showAlert(Alert.AlertType.ERROR, "Login Failed", "User does not exist.");
         }
     }
@@ -89,8 +89,30 @@ public class LoginApp extends Application {
         gridPane.setVgap(10);
         gridPane.setHgap(10);
 
-        Label label = new Label("Fill in the new user details here...");
-        gridPane.add(label, 0, 0);
+        Label usernameLabel = new Label("Username:");
+        TextField usernameField = new TextField();
+        Label passwordLabel = new Label("Password");
+        PasswordField passwordField = new PasswordField();
+        Button createButton = new Button("Create");
+
+        gridPane.add(usernameLabel, 0, 0);
+        gridPane.add(usernameField, 1, 0);
+        gridPane.add(passwordLabel, 0, 1);
+        gridPane.add(passwordField, 1, 1);
+        gridPane.add(createButton, 1, 2);
+
+        //Handle user creation
+        createButton.setOnAction(actionEvent -> {
+            String username = usernameField.getText();
+            String password = passwordField.getText();
+            if (!username.isEmpty() && !password.isEmpty()) {
+                users.put(username, password);
+                showAlert(Alert.AlertType.INFORMATION, "User Created", "User " + username + " created successfully!");
+                createUserStage.close();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Creation Failed", "Please fill in both fields.");
+            }
+        });
 
         Scene scene = new Scene(gridPane, 300, 150);
         createUserStage.setScene(scene);
@@ -107,20 +129,32 @@ public class LoginApp extends Application {
         gridPane.setVgap(10);
         gridPane.setHgap(10);
 
-        Label label = new Label("Enter your email to recover your account:");
-        TextField emailField = new TextField();
+        Label label = new Label("Enter your username to recover your account:");
+        TextField usernameField = new TextField();
         Button submitButton = new Button("Submit");
 
         gridPane.add(label, 0, 0);
-        gridPane.add(emailField, 0, 1);
+        gridPane.add(usernameField, 0, 1);
         gridPane.add(submitButton, 0, 2);
+
+        //Handle password recovery
+        submitButton.setOnAction(actionEvent -> {
+            String username = usernameField.getText();
+            if (users.containsKey(username)) {
+                showAlert(Alert.AlertType.INFORMATION, "Password Recovery", "Your password is: " + users.get(username));
+                forgotPasswordStage.close();
+            } else {
+                showAlert(Alert.AlertType.ERROR, "Recovery Failed", "Username does not exist.");
+            }
+        });
 
         Scene scene = new Scene(gridPane, 300, 150);
         forgotPasswordStage.setScene(scene);
         forgotPasswordStage.show();
     }
+
     // Helper method to show alert messages
-    private void showAlert(Alert.AlertType alertType , String title , String message) {
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);
