@@ -16,6 +16,13 @@ public class LoginApp extends Application {
     private final Map<String, String> users = new HashMap<>();
 
     @Override
+    public void init() throws Exception {
+        super.init();
+        // Ensure the users table is created before the application starts
+        Database.createUsersTable();
+    }
+
+    @Override
     public void start(Stage primaryStage) {
 
         //Create the login form
@@ -66,15 +73,13 @@ public class LoginApp extends Application {
     //Method to handle login logic
     private void handleLogin(String username, String password) {
 
-        if (users.containsKey(username)) {
-            if (users.get(username).equals(password)) {
-                showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
-            } else {
-                showAlert(Alert.AlertType.ERROR, "Login Failed", "Incorrect password.");
-            }
-
+        // Validate login credentials using the UserDAO method
+        if (UserDAO.validateLogin(username, password)) {
+            // If the credentials are valid
+            showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
         } else {
-            showAlert(Alert.AlertType.ERROR, "Login Failed", "User does not exist.");
+            // If credentials are invalid (either user doesn't exist or password is incorrect)
+            showAlert(Alert.AlertType.ERROR, "Login Failed", "Invalid credentials.");
         }
     }
 
@@ -106,9 +111,16 @@ public class LoginApp extends Application {
             String username = usernameField.getText();
             String password = passwordField.getText();
             if (!username.isEmpty() && !password.isEmpty()) {
-                users.put(username, password);
-                showAlert(Alert.AlertType.INFORMATION, "User Created", "User " + username + " created successfully!");
-                createUserStage.close();
+                String result = UserDAO.addUser(username, password);
+
+                if (result.equals("User created successfully")) {
+                    showAlert(Alert.AlertType.INFORMATION, "User Created", "User " + username + " created successfully!");
+                    createUserStage.close();
+                } else if (result.equals("Username already exists")) {
+                    showAlert(Alert.AlertType.WARNING, "User Creation Failed", "Username '" + username + "' is already taken. Please choose a different username.");
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", result);
+                }
             } else {
                 showAlert(Alert.AlertType.ERROR, "Creation Failed", "Please fill in both fields.");
             }
