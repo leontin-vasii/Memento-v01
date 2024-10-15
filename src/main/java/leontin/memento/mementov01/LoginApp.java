@@ -7,7 +7,13 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import javafx.stage.Stage;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class LoginApp extends Application {
+
+    //Store users in a HashMap (later replace with a database)
+    private Map<String, String> users = new HashMap<>();
 
     @Override
     public void start(Stage primaryStage) throws Exception {
@@ -45,6 +51,9 @@ public class LoginApp extends Application {
         forgotPasswordLink.setOnAction(e -> openForgotPasswordWindow());
         gridPane.add(forgotPasswordLink, 1, 3);
 
+        //Handle login button click
+        loginButton.setOnAction(actionEvent -> handleLogin(usernameField.getText(), passwordField.getText()));
+
         // Set up the scene and stage
         Scene scene = new Scene(gridPane, 600, 600);
         primaryStage.setTitle("Login");
@@ -53,6 +62,22 @@ public class LoginApp extends Application {
 
 
     }
+
+    //Method to handle login logic
+    private void handleLogin (String username , String password) {
+
+        if (users.containsKey(username)){
+            if (users.get(username).equals(password)) {
+                showAlert(Alert.AlertType.INFORMATION, "Login Successful", "Welcome, " + username + "!");
+            }else {
+                showAlert(Alert.AlertType.ERROR , "Login Failed", "Incorrect password." );
+            }
+
+        }else {
+            showAlert(Alert.AlertType.ERROR, "Login Failed", "User does not exist.");
+        }
+    }
+
 
     // Method to open the 'Create New User' window
     private void openCreateUserWindow() {
@@ -93,5 +118,13 @@ public class LoginApp extends Application {
         Scene scene = new Scene(gridPane, 300, 150);
         forgotPasswordStage.setScene(scene);
         forgotPasswordStage.show();
+    }
+    // Helper method to show alert messages
+    private void showAlert(Alert.AlertType alertType , String title , String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
